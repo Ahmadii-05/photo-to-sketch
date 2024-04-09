@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Photo to Sketch Converter</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Link to the CSS stylesheet -->
+    <style>
+        /* CSS for Medium Size Images */
+        .sketch-images img {
+            max-width: 500px; /* Set the maximum width of the image */
+            height: 500px; /* Maintain aspect ratio */
+        }
+    </style>
+</head>
+<body>
+    <h1>Photo to Sketch Converter</h1>
+    
+    <!-- Direct File Upload Form -->
+    <form id="upload-form" action="/upload" method="POST" enctype="multipart/form-data">
+        <input type="file" id="file-input" name="file" accept="image/*">
+        <button type="submit">Convert Direct Upload</button>
+    </form>
+
+    <!-- Live Capture -->
+    <h2>Live Capture</h2>
+    <div id="live-capture-container">
+        <video id="live-video" width="400" autoplay></video>
+        <canvas id="live-canvas" style="display: none;"></canvas>
+        <img id="live-image" alt="Live Capture" width="400" style="display: none;">
+        <button onclick="capture()">Capture</button>
+    </div>
+
+    <!-- Convert Button for Live Capture -->
+    <button onclick="convertLiveCapture()">Convert Live Capture</button>
+
+    <!-- Display Uploaded Image -->
+    <div class="sketch-images">
+        {% if output %}
+            <div>
+                <h2>Original Image</h2>
+                <img src="{{ output }}" alt="Original Image">
+            </div>
+            <div>
+                <h2>Sketch</h2>
+                <img id="sketch-img" src="{{ sketch }}" alt="Sketch Image">
+                <button onclick="downloadSketch()">Download Sketch</button> <!-- Button to download sketch -->
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Download Button for Converted Sketch -->
+    <button id="download-button" style="display: none;">Download Converted Sketch</button>
+</div>
+
+    <script>
+        var video = document.getElementById('live-video');
+        var canvas = document.getElementById('live-canvas');
+        var context = canvas.getContext('2d');
+        var liveImage = document.getElementById('live-image');
+
+        var stream; // Variable to store the video stream
+
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(function(s) {
+                stream = s; // Store the video stream in the variable
+                video.srcObject = stream;
+                video.play();
+            })
+            .catch(function(error) {
+                console.error('Error accessing camera: ', error);
+            });
+
+        function capture() {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            liveImage.src = canvas.toDataURL('image/jpeg');
+
+            // Stop the video stream after capturing an image
+            stream.getTracks().forEach(track => {
+                track.stop();
+            });
+
+            // Display the captured image instead of the video
+            video.style.display = 'none';
+            liveImage.style.display = 'inline';
+        }
+
+        function convertLiveCapture() {
+            var dataURL = canvas.toDataURL('image/jpeg');
+            var blob = dataURItoBlob(dataURL);
+            var file = new File([blob], 'live_capture.jpg', { type: 'image/jpeg' });
+            var formData = new FormData();
+            formData.append('file', file);
+            fetch('/upload', { method: 'POST', body: formData })
+                .then(response => response.text())
+                .then(data => {
+                    document.body.innerHTML = data;
+                })
+                .catch(error => console.error('Error converting live capture: ', error));
+        }
+
+        function dataURItoBlob(dataURI) {
+            var byteString = atob(dataURI.split(',')[1]);
+            var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+            var ab = new ArrayBuffer(byteString.length);
+            var ia = new Uint8Array(ab);
+            for (var i = 0; i < byteString.length; i++) {
+                ia[i] = byteString.charCodeAt(i);
+            }
+            var blob = new Blob([ab], { type: mimeString });
+            return blob;
+        }
+        
+
+         // Function to download the sketch image
+         function downloadSketch() {
+            var sketchImg = document.getElementById('sketch-img');
+            var sketchUrl = sketchImg.src;
+            var a = document.createElement('a');
+            a.href = sketchUrl;
+            a.download = 'sketch.jpg'; // Set desired filename for the downloaded image
+            a.click();
+        }
+    </script>
+</body>
+</html>

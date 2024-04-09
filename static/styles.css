@@ -1,0 +1,96 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f8f9fa;
+    margin: 0;
+    padding: 20px;
+}
+
+h1, h2 {
+    color: #343a40;
+}
+
+form {
+    margin-bottom: 20px;
+}
+
+#upload-form button, #live-capture-container button {
+    background-color: #007bff; /* Blue */
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin-top: 10px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+#upload-form button:hover, #live-capture-container button:hover {
+    background-color: #0056b3;
+}
+
+input[type=file] {
+    display: none;
+}
+
+.sketch-images {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.sketch-images div {
+    margin-right: 20px;
+}
+
+.sketch-images img {
+    max-width: 500px;
+    height: 500px;
+    border-radius: 5px;
+}
+
+#live-capture-container {
+    background-color: #50135d;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+#live-video, #live-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+/* Additional Styles for Colorful Interface */
+h1 {
+    background-color: #007bff; /* Blue */
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+h2 {
+    color: #007bff; /* Blue */
+}
+
+button.convert {
+    background-color: #28a745; /* Green */
+}
+
+button.convert:hover {
+    background-color: #218838; /* Darker Green */
+}
+
+button.download {
+    background-color: #ffc107; /* Yellow */
+}
+
+button.download:hover {
+    background-color: #e0a800; /* Darker Yellow */
+}
